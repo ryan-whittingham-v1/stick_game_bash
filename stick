@@ -1,0 +1,142 @@
+#!/bin/bash
+
+##############################################################
+#Ryan Whittingham
+#CSE 224
+#October 4, 2018
+#Programming Assignment 1
+#############################################################
+
+###############  Program  Description  #########################
+# Simple game of strategy against the computer. The object is to take "sticks"
+# until there are no more. Whoever takes the last stick is the winner.
+################################################################  
+
+stickCount=0
+turn="x"
+illegalCount=0
+choice=0
+
+echo
+echo "Welcome to the Stick Game!"
+echo
+
+############## input number of sticks #########################
+while [[ $stickCount -lt 10 ]] || [[ $(($stickCount*1)) != "$stickCount" ]]
+	do
+		echo -n "How many sticks would you like to play with: "
+		read stickCount
+		if [[ $stickCount -lt 10 ]]
+		then
+			echo "That is not a valid input. We need  at least 10 sticks to play the game."
+			echo
+		fi
+	done
+##############################################################
+
+############### input who will go first ######################
+echo
+echo "Who should go first?"
+until [[ $turn == c ]] || [[ $turn == u ]]
+do
+	echo -n "Enter u for user or c for computer: "
+	read turn
+	if [[ $turn == c ]]
+	then
+		echo
+		echo "Okay. I'll go first."
+	elif [[ $turn == u ]]
+	then	
+		echo
+		echo "Okay. you go first"
+	else
+		echo "That is not a valid input."
+		echo "Please try again."
+		echo
+	fi
+done
+################################################################
+
+####################  Gameplay  ################################
+while [[ $stickCount -gt 0 ]] 
+do	
+	sleep .5s
+	################  Print current sticks  ##############
+	i=0
+	echo 
+	echo "Current number of sticks:"
+	while [[ $i -lt $stickCount ]]
+		do
+		echo -n "|"
+		i=$(($i+1))
+	done
+	echo "($stickCount)"
+	###########################################################	
+	sleep .5s 
+	################   CPU's turn  ############################
+	if [[ $turn == c ]]
+	then	
+		remainder=$((stickCount%4))
+		if [[ $remainder == 0 ]]
+		then
+			echo
+			echo "I will take 1."
+			stickCount=$((stickCount-1))
+			turn="u"
+		else
+			echo
+			echo "I will take $remainder."
+			stickCount=$(($stickCount-$remainder))
+			turn="u"
+		fi
+	#######################################################
+	sleep .5s
+	########################  User's turn  #########################
+	else
+		while [[ $turn == u ]]
+		do
+			if [[ $illegalCount -gt 1 ]]
+			then
+				echo
+				echo "You did not follow the rules."
+				echo "Game over."
+				echo
+				exit
+			else
+				echo
+				echo  -n "How many sticks do you want to take: "
+				read choice
+				if [[ $choice -gt 0 ]] && [[ $choice -lt 4 ]]
+				then
+					stickCount=$(($stickCount-$choice))
+					turn="c"
+					illegalCount=0
+				else
+					echo
+					echo "That is an illegal move."
+					echo "You can only take 1, 2, or 3 sticks at a time."
+					illegalCount=$(($illegalCount+1))
+				fi
+			fi
+		done		
+	fi
+	##############################################################
+done
+sleep .5s
+echo
+echo "There are no more sticks left."
+######################################################################
+
+#########################  Output winner  ############################
+if [[ $turn == c ]]
+then	
+	echo
+	echo "Wow! You won."
+else
+	echo
+	echo "Hooray! I won."
+fi
+#####################################################################
+echo "Game over."
+echo
+exit
